@@ -55,3 +55,14 @@ def get_current_active_superuser(current_user: CurrentUser) -> User:
             status_code=403, detail="The user doesn't have enough privileges"
         )
     return current_user
+from app.group.service.group_service import GroupService
+
+def get_group_service(
+    session: SessionDep
+) -> GroupService:
+    from app.group.repository.group_repo import GroupRepository
+    repo= GroupRepository(session=session)
+    group_service = GroupService(repo=repo)
+    return group_service
+  
+group_service = Annotated[GroupService, Depends(get_group_service)]
