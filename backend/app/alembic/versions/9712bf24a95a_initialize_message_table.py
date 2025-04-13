@@ -27,23 +27,8 @@ def upgrade():
         sa.Column("content", sa.String(length=255), nullable=False),
         sa.Column("timestamp", sa.DateTime(), nullable=False),
     )
-    op.create_foreign_key(
-        "fk_message_sender",
-        "chat",
-        "user",
-        ["sender_id"],
-        ["id"],
-        ondelete="CASCADE"  
-    )
-    op.create_foreign_key(
-        "fk_message_group",
-        "chat",
-        "group",
-        ["group_id"],
-        ["id"],
-        ondelete="CASCADE"
-    )
+    
 
 
 def downgrade():
-    op.drop_table("user_message")
+    op.drop_table("chat")

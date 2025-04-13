@@ -65,4 +65,4 @@ def get_group_service(
     group_service = GroupService(repo=repo)
     return group_service
   
-group_service = Annotated[GroupService, Depends(get_group_service)]
+GroupSer = Annotated[GroupService, Depends(get_group_service)]
