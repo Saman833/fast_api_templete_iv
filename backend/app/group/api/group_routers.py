@@ -13,7 +13,6 @@ from app.group.schema.group_schema import (
 router = APIRouter(prefix="/group", tags=["group"])
 @router.post("/", response_model=GroupPublic)
 def create_group(*,current_user:CurrentUser ,group_service:GroupSer, group_create:GroupCreate):
-    print ("im in create group" , 1000*"+")
     print("current user id , :" , current_user.id) 
     print ("current user id type : " , type(current_user.id))
     return group_service.create_new_group(owner_id=current_user.id,group_in=group_create) 

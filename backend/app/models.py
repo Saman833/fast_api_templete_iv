@@ -1,7 +1,8 @@
 import uuid
-
+import datetime
 from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel
+from typing import Optional
 
 
 # Shared properties
@@ -44,6 +45,9 @@ class User(UserBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     hashed_password: str
     items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
+    affirmation_opted: bool = Field(default=False)
+    affirmation_time: Optional[datetime.time] = Field(default=None)
+
 
 
 # Properties to return via API, id is always required

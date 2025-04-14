@@ -38,6 +38,7 @@ def test_create_group(repo, sample_group):
     assert result is not None
     assert result.id == sample_group.id
  
+ 
 def test_get_group_by_id(repo, sample_group):
     repo.create_group(sample_group)
     result = repo.get_group_by_id(group_id=sample_group.id)
@@ -63,7 +64,6 @@ def test_get_group_by_user_id_none(repo):
     assert result == []
 
 
- 
 def test_update_group_info(repo, sample_group):
     repo.create_group(sample_group)
     update_data = GroupUpdate(id=sample_group.id, name="Updated Name")
@@ -72,7 +72,6 @@ def test_update_group_info(repo, sample_group):
     
     assert updated_group.name == "Updated Name"
     assert updated_group.id == sample_group.id
-
 
 
 def test_delete_group_by_id(repo, sample_group):
