@@ -1,25 +1,35 @@
 
-from app.api.deps import SessionDep 
-from sqlmodel import Session , select 
-import uuid
-from app.affirmation.model.affirmation_model import Affirmation
-from app.affirmation.model.user_affirmation_model import UserAffirmation
-from sqlalchemy.orm import aliased
-from sqlalchemy import select, outerjoin
-class affirmationRepository:
-    def __init__(self, session:Session ):
+from sqlmodel import select
+from app.affirmation.model.affirmation_model import Affirmation 
+from app.affirmation.model.user_affirmation_model import UserAffirmation 
+from app.api.deps import SessionDep
+class AffirmationRepo:
+    def __init__(self, session: SessionDep):
         self.session = session
 
+    def get_random_affirmation(self) -> Affirmation:
+        statement = select(Affirmation).order_by(func.random()).limit(1)
+        return self.session.exec(statement).first()
 
-    def create_affirmation(self, affirmation: Affirmation) -> Affirmation| None:
-        pass
+    def create_affirmation(self, affirmation: Affirmation):
+        self.session.add(affirmation)
+        self.session.commit()
+        self.session.refresh(affirmation)
+        return affirmation
 
+class UserAffirmationRepo:
+    def __init__(self, session: SessionDep):
+        self.session = session
 
-    def get_affirmation_by_id(self,affirmation_id=uuid.UUID) -> Affirmation| None:
-        
-        pass 
+    def create_or_update(self, user_aff: UserAffirmation):
+        self.session.add(user_aff)
+        self.session.commit()
+        self.session.refresh(user_aff)
+        return user_aff
 
-    def create_recoreds
+    def get_users_to_notify(self, current_time) -> list[tuple[str, str]]:
+        # This should join with user preferences; mock logic:
+        return self.session.exec("SELECT user_id FROM user WHERE is_opted = true AND scheduled_time = :t", {"t": current_time}).all()
 
 
             
