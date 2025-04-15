@@ -46,7 +46,7 @@ class User(UserBase, table=True):
     hashed_password: str
     items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
     affirmation_opted: bool = Field(default=False)
-    affirmation_time: Optional[datetime.time] = Field(default=None)
+    affirmation_schedule : Optional[datetime.time] = Field(default=None)
 
 
 

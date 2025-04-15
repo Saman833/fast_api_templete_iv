@@ -1,3 +1,30 @@
+"""
+This module defines the API routes for managing user affirmations. It includes endpoints for opting in to receive daily affirmations, 
+opting out, updating affirmation settings, and retrieving the current user's affirmation settings.
+
+Routes:
+    - POST /user-affirmation/opt-in: Opt the current user in to receiving daily affirmations.
+    - DELETE /user-affirmation/opt-out: Opt the current user out of receiving daily affirmations.
+    - PUT /user-affirmation/update: Update the user's affirmation settings.
+    - GET /user-affirmation/: Retrieve the current user's affirmation settings.
+
+Dependencies:
+    - `current_user`: The currently authenticated user.
+    - `affirmation_service`: Service layer for handling affirmation-related operations.
+
+Schemas:
+    - `AffirmationCreate`: Schema for creating a new affirmation.
+    - `AffirmationUpdate`: Schema for updating an existing affirmation.
+    - `AffirmationDetail`: Schema for detailed affirmation information.
+    - `AffirmationOut`: Schema for outputting affirmation data.
+
+Repositories:
+    - `AffirmationRepo`: Repository for managing affirmations.
+    - `UserAffirmationRepo`: Repository for managing user-specific affirmations.
+
+Services:
+    - `AffirmationService`: Service class for business logic related to affirmations. 
+"""
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
 
@@ -14,19 +41,7 @@ from app.affirmation.repository.affirmation_repo import (
 from app.affirmation.service.affirmation_service import AffirmationService
 from app.api.deps import SessionDep, CurrentUser, AffirmationSer
 
-router = APIRouter(prefix="/affirmations", tags=["affirmations"])
-
-
-@router.post("/send/{user_id}", response_model=AffirmationOut)
-def send_affirmation(user_id: str, db_session: SessionDep):
-    """
-    Send a daily affirmation to the specified user.
-    """
-    affirmation_repo = AffirmationRepo(db_session)
-    user_aff_repo = UserAffirmationRepo(db_session)
-    service = AffirmationService(affirmation_repo, user_aff_repo)
-    return service.send_daily_affirmation(user_id)
-
+router = APIRouter(prefix="/user-affirmation", tags=["user-affirmation"])
 
 @router.post("/opt-in", response_model=AffirmationDetail)
 def opt_in_affirmation(
@@ -57,7 +72,7 @@ def opt_out_affirmation(
 
 
 @router.put("/update", response_model=AffirmationDetail)
-def update_affirmation_detail(
+def update_user_affirmation_setings(
     *,
     current_user: CurrentUser,
     affirmation_update: AffirmationUpdate,
@@ -73,7 +88,7 @@ def update_affirmation_detail(
 
 
 @router.get("/", response_model=AffirmationDetail)
-def get_affirmation_detail(
+def get_user_affirmation_settings(
     *,
     current_user: CurrentUser,
     affirmation_service: AffirmationSer
