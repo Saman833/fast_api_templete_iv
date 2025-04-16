@@ -1,9 +1,9 @@
 import uuid
-import datetime
 from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel
 from typing import Optional
-
+from datetime import datetime, time as dt_time
+affirmation_schedule: Optional[dt_time] = Field(default_factory=lambda: datetime.now().time())
 
 # Shared properties
 class UserBase(SQLModel):
@@ -46,8 +46,7 @@ class User(UserBase, table=True):
     hashed_password: str
     items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
     affirmation_opted: bool = Field(default=False)
-    affirmation_schedule : Optional[datetime.time] = Field(default=None)
-
+    affirmation_schedule: Optional[dt_time] = Field(default_factory=lambda: datetime.now().time())
 
 
 # Properties to return via API, id is always required

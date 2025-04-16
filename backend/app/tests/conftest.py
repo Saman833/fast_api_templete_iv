@@ -10,7 +10,8 @@ from app.main import app
 from app.models import Item, User
 from app.tests.utils.user import authentication_token_from_email
 from app.tests.utils.utils import get_superuser_token_headers
-
+from app.affirmation.model.affirmation_model import  Affirmation
+from app.affirmation.model.user_affirmation_model import UserAffirmation
 
 @pytest.fixture(scope="session", autouse=True)
 def db() -> Generator[Session, None, None]:
@@ -20,6 +21,10 @@ def db() -> Generator[Session, None, None]:
         statement = delete(Item)
         session.execute(statement)
         statement = delete(User)
+        session.execute(statement)
+        statement= delete(UserAffirmation)
+        session.execute(statement)
+        statement= delete(Affirmation)
         session.execute(statement)
         session.commit()
 

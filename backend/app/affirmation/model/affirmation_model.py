@@ -6,7 +6,7 @@ from datetime import datetime
 import uuid
 
 class Affirmation(SQLModel, table=True):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True)
-    title: str
-    content: str 
+    id:uuid.UUID  = Field(default_factory=uuid.uuid4, primary_key=True)
+    title: str =Field(min_length=4 , max_length=20)
+    content: str =Field(min_length=10 , max_length=500)
 

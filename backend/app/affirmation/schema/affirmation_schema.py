@@ -1,17 +1,5 @@
-from pydantic import BaseModel
-from datetime import datetime
+from sqlmodel import SQLModel, Field
 
-class AffirmationCreate(BaseModel):
+class AffirmationCreate(SQLModel):
     title: str
-    content: str
-
-class AffirmationOut(BaseModel):
-    id: str
-    title: str
-    content: str
-
-class UserAffirmationOut(BaseModel):
-    user_id: str
-    affirmation_id: str
-    status: str
-    sent_at: datetime | None = None
+    content: str 

@@ -2,7 +2,8 @@ import sentry_sdk
 from fastapi import FastAPI
 from fastapi.routing import APIRoute
 from starlette.middleware.cors import CORSMiddleware
-
+from app.affirmation.affirmation_process_agent import affirmation_process_agent 
+import threading
 from app.api.main import api_router
 from app.core.config import settings
 
@@ -31,3 +32,8 @@ if settings.all_cors_origins:
     )
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
+
+@app.on_event("startup")
+def startup_event():
+    thread = threading.Thread(target=affirmation_process_agent, daemon=True)
+    thread.start()
