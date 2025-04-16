@@ -104,7 +104,7 @@ class UserAffirmationService:
         if not users_to_be_sent:
             return
         for user in users_to_be_sent:
-            if self.is_affirmationed_today(user.id):
+            if self.is_affirmationed_today(user.id) or not user.affirmation_opted:
                 continue
             user_af_recored: Optional[UserAffirmation] = self.get_first_unsent_affirmation(user_id=user.id)
             if not user_af_recored:
