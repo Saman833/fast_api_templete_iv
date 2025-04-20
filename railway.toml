@@ -1,5 +1,6 @@
+[deploy]
+  rootDirectory = "backend"
 [build]
   builder = "Dockerfile"
 
-[deploy]
-  rootDirectory = "backend"
+
