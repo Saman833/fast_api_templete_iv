@@ -3,8 +3,12 @@ from sqlmodel import Session, create_engine, select
 from app import crud
 from app.core.config import settings
 from app.models import User, UserCreate
+import os
 
-engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
+DATABASE_URL =  "postgresql://postgres:YpThUpVslzmYgtksSWpWIrDeYkxryzsX@postgres.railway.internal:5432/railway"
+
+from sqlalchemy import create_engine
+engine = create_engine(DATABASE_URL)
 
 
 # make sure all SQLModel models are imported (app.models) before initializing DB
