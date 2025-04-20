@@ -2,5 +2,4 @@
   builder = "Dockerfile"
 
 [deploy]
-  startCommand = ""
   rootDirectory = "backend"
