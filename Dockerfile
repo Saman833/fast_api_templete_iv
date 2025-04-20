@@ -3,29 +3,26 @@ FROM python:3.10
 ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
-# Install uv (dependency manager)
+# Install uv
 COPY --from=ghcr.io/astral-sh/uv:0.5.11 /uv /uvx /bin/
 
-# Add uv binary to path
 ENV PATH="/app/.venv/bin:$PATH"
 ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
 ENV PYTHONPATH=/app
 
-# Copy requirement files early
+# Copy dependency files
 COPY ./pyproject.toml ./uv.lock ./alembic.ini /app/
 
-# Install dependencies
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-install-project
+# Install dependencies (no cache mounts)
+RUN uv sync --frozen --no-install-project
 
-# Copy app code
+# Copy application code
 COPY ./app /app/app
 COPY ./scripts /app/scripts
 
-# Install project itself (optional)
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync
+# Final sync
+RUN uv sync
 
-# Run FastAPI via uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+# Start the FastAPI app
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
