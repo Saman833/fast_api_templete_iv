@@ -5,9 +5,8 @@ from app.core.config import settings
 from app.models import User, UserCreate
 import os
 
-DATABASE_URL =  "postgresql://postgres:YpThUpVslzmYgtksSWpWIrDeYkxryzsX@postgres.railway.internal:5432/railway"
-
-from sqlalchemy import create_engine
+DATABASE_URL =  "postgresql://postgres:YpThUpVslzmYgtks********yzsX@postgres.railway.internal:5432/railway"
+ 
 engine = create_engine(DATABASE_URL)
 
 
