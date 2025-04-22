@@ -14,7 +14,7 @@ RUN python -m venv /app/.venv
 COPY ./backend/requirements.txt /app/
 
 # Install dependencies
-RUN . /app/.venv/bin/activate && pip install --upgrade pip && pip install -r requirements.txt
+RUN /app/.venv/bin/pip install --upgrade pip && /app/.venv/bin/pip install -r requirements.txt
 
 # Copy app source code from backend
 COPY ./backend/app /app/app
