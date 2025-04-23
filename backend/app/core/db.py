@@ -4,11 +4,7 @@ from app import crud
 from app.core.config import settings
 from app.models import User, UserCreate
 import os
-
-DATABASE_URL =  "postgresql://postgres:YpThUpVslzmYgtks********yzsX@postgres.railway.internal:5432/railway"
- 
-engine = create_engine(DATABASE_URL)
-
+engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
 
 # make sure all SQLModel models are imported (app.models) before initializing DB
 # otherwise, SQLModel might fail to initialize relationships properly
