@@ -28,7 +28,7 @@ if sync_url:
     config.set_main_option("sqlalchemy.url", sync_url)
 
 # === Import your Base metadata ===
-from models import Base  # adjust if it's under app.models or similar
+from app.models import Base  # adjust if it's under app.models or similar
 target_metadata = Base.metadata
 
 # === Run migrations ===
