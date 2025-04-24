@@ -1,40 +1,65 @@
+# ──────────────────────────────
+#  Dockerfile – FastAPI backend
+#  with Alembic auto-migration
+# ──────────────────────────────
 FROM python:3.10-slim
 
-# Disable .pyc generation and enable unbuffered logs
-ENV PYTHONUNBUFFERED=1
-ENV PYTHONDONTWRITEBYTECODE=1
+# ---------------------------------------------------------------------------
+# Basic runtime settings
+# ---------------------------------------------------------------------------
+ENV PYTHONUNBUFFERED=1      \
+    PYTHONDONTWRITEBYTECODE=1
+
 WORKDIR /app
 
-# Set environment variables
+# ---------------------------------------------------------------------------
+# Paths & environment
+# ---------------------------------------------------------------------------
 ENV VENV_PATH="/app/.venv"
 ENV PATH="$VENV_PATH/bin:$PATH"
 ENV PYTHONPATH="/app"
 
-# Install system packages (required by some Python packages)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    gcc \
-    libpq-dev \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+# ---------------------------------------------------------------------------
+# System dependencies (build-essential, libpq for PostgreSQL, etc.)
+# ---------------------------------------------------------------------------
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        gcc \
+        libpq-dev \
+        curl && \
+    rm -rf /var/lib/apt/lists/*
 
-# Create and activate virtualenv
-RUN python -m venv $VENV_PATH
+# ---------------------------------------------------------------------------
+# Virtual environment
+# ---------------------------------------------------------------------------
+RUN python -m venv "${VENV_PATH}"
 
-# Copy and inspect requirements.txt
-COPY ./backend/requirements.txt /app/
-RUN cat /app/requirements.txt
+# ---------------------------------------------------------------------------
+# Python requirements
+# ---------------------------------------------------------------------------
+COPY ./backend/requirements.txt /app/requirements.txt
 
-# Install dependencies with pip directly from the venv
-RUN $VENV_PATH/bin/pip install --upgrade pip
-RUN $VENV_PATH/bin/pip install -r /app/requirements.txt
+RUN "${VENV_PATH}/bin/pip" install --upgrade pip && \
+    "${VENV_PATH}/bin/pip" install -r /app/requirements.txt
 
-# Copy app source code
-COPY ./backend/app /app/app
-COPY ./backend/scripts /app/scripts
+# ---------------------------------------------------------------------------
+# Application source
+# ---------------------------------------------------------------------------
+COPY ./backend/app      /app/app
+COPY ./backend/scripts  /app/scripts
 
-# Expose port for FastAPI
+# Make the entry-point script executable
+RUN chmod +x /app/scripts/entrypoint.sh
+
+# ---------------------------------------------------------------------------
+# Network / runtime
+# ---------------------------------------------------------------------------
 EXPOSE 8000
 
-# Start FastAPI app
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Use the script that:
+#   1. Activates the venv
+#   2. Generates an Alembic revision (autogenerate) if needed
+#   3. Upgrades to head
+#   4. Launches Uvicorn
+ENTRYPOINT ["/app/scripts/entrypoint.sh"]
