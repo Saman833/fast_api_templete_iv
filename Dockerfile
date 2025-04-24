@@ -1,29 +1,65 @@
-FROM python:3.10
+# ──────────────────────────────
+#  Dockerfile – FastAPI backend
+#  with Alembic auto-migration
+# ──────────────────────────────
+FROM python:3.10-slim
 
-ENV PYTHONUNBUFFERED=1
+# ---------------------------------------------------------------------------
+# Basic runtime settings
+# ---------------------------------------------------------------------------
+ENV PYTHONUNBUFFERED=1      \
+    PYTHONDONTWRITEBYTECODE=1
+
 WORKDIR /app
 
-# Install uv (dependency manager)
-COPY --from=ghcr.io/astral-sh/uv:0.5.11 /uv /uvx /bin/
+# ---------------------------------------------------------------------------
+# Paths & environment
+# ---------------------------------------------------------------------------
+ENV VENV_PATH="/app/.venv"
+ENV PATH="$VENV_PATH/bin:$PATH"
+ENV PYTHONPATH="/app"
 
-# Set env vars
-ENV PATH="/app/.venv/bin:$PATH"
-ENV UV_COMPILE_BYTECODE=1
-ENV UV_LINK_MODE=copy
-ENV PYTHONPATH=/app
+# ---------------------------------------------------------------------------
+# System dependencies (build-essential, libpq for PostgreSQL, etc.)
+# ---------------------------------------------------------------------------
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        gcc \
+        libpq-dev \
+        curl && \
+    rm -rf /var/lib/apt/lists/*
 
-# Copy dependency files from backend folder
-COPY ./backend/pyproject.toml ./backend/uv.lock ./backend/alembic.ini /app/
+# ---------------------------------------------------------------------------
+# Virtual environment
+# ---------------------------------------------------------------------------
+RUN python -m venv "${VENV_PATH}"
 
-# Install dependencies
-RUN uv sync --frozen --no-install-project
+# ---------------------------------------------------------------------------
+# Python requirements
+# ---------------------------------------------------------------------------
+COPY ./backend/requirements.txt /app/requirements.txt
 
-# Copy app source code from backend
-COPY ./backend/app /app/app
-COPY ./backend/scripts /app/scripts
+RUN "${VENV_PATH}/bin/pip" install --upgrade pip && \
+    "${VENV_PATH}/bin/pip" install -r /app/requirements.txt
 
-# Final sync (optional but good to keep)
-RUN uv sync
+# ---------------------------------------------------------------------------
+# Application source
+# ---------------------------------------------------------------------------
+COPY ./backend/app      /app/app
+COPY ./backend/scripts  /app/scripts
 
-# Start FastAPI app
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Make the entry-point script executable
+RUN chmod +x /app/scripts/entrypoint.sh
+
+# ---------------------------------------------------------------------------
+# Network / runtime
+# ---------------------------------------------------------------------------
+EXPOSE 8000
+
+# Use the script that:
+#   1. Activates the venv
+#   2. Generates an Alembic revision (autogenerate) if needed
+#   3. Upgrades to head
+#   4. Launches Uvicorn
+ENTRYPOINT ["/app/scripts/entrypoint.sh"]
