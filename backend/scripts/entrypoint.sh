@@ -2,10 +2,9 @@
 set -e
 source /app/.venv/bin/activate
 
-# Point Alembic at the right ini file
-ALEMBIC_CFG="/app/alembic.ini"
+ALEMBIC_CFG=/app/alembic.ini   # ← matches the copy above
 
-echo "⏩ Generating new Alembic revision (autogenerate)…"
+echo "⏩ Generating auto-migration (if needed)…"
 alembic -c "$ALEMBIC_CFG" revision --autogenerate -m "auto migration" || true
 
 echo "⏫ Applying migrations…"
