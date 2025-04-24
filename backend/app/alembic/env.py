@@ -28,8 +28,8 @@ if sync_url:
     config.set_main_option("sqlalchemy.url", sync_url)
 
 # === Import your Base metadata ===
-from app.models import Base  # adjust if it's under app.models or similar
-target_metadata = Base.metadata
+from sqlmodel import SQLModel           # NEW LINE
+target_metadata = SQLModel.metadata   
 
 # === Run migrations ===
 def run_migrations_offline() -> None:
