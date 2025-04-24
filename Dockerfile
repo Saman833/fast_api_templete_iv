@@ -1,65 +1,41 @@
-# ──────────────────────────────
-#  Dockerfile – FastAPI backend
-#  with Alembic auto-migration
-# ──────────────────────────────
+# ────────────────────────────────
+#  Dockerfile – FastAPI + Alembic
+# ────────────────────────────────
 FROM python:3.10-slim
 
-# ---------------------------------------------------------------------------
-# Basic runtime settings
-# ---------------------------------------------------------------------------
-ENV PYTHONUNBUFFERED=1      \
+ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /app
 
-# ---------------------------------------------------------------------------
-# Paths & environment
-# ---------------------------------------------------------------------------
 ENV VENV_PATH="/app/.venv"
 ENV PATH="$VENV_PATH/bin:$PATH"
 ENV PYTHONPATH="/app"
 
-# ---------------------------------------------------------------------------
-# System dependencies (build-essential, libpq for PostgreSQL, etc.)
-# ---------------------------------------------------------------------------
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        build-essential \
-        gcc \
-        libpq-dev \
-        curl && \
+# ----- system deps ----------------------------------------------------------
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential gcc libpq-dev curl && \
     rm -rf /var/lib/apt/lists/*
 
-# ---------------------------------------------------------------------------
-# Virtual environment
-# ---------------------------------------------------------------------------
+# ----- virtual-env ----------------------------------------------------------
 RUN python -m venv "${VENV_PATH}"
 
-# ---------------------------------------------------------------------------
-# Python requirements
-# ---------------------------------------------------------------------------
+# ----- Python deps ----------------------------------------------------------
 COPY ./backend/requirements.txt /app/requirements.txt
-
 RUN "${VENV_PATH}/bin/pip" install --upgrade pip && \
     "${VENV_PATH}/bin/pip" install -r /app/requirements.txt
 
-# ---------------------------------------------------------------------------
-# Application source
-# ---------------------------------------------------------------------------
-COPY ./backend/app      /app/app
-COPY ./backend/scripts  /app/scripts
+# ----- source code ----------------------------------------------------------
+COPY ./backend/app       /app/app
+COPY ./backend/scripts   /app/scripts
 
-# Make the entry-point script executable
+# Alembic config (root-level)  🔥  NEW
+COPY ./alembic.ini       /app/alembic.ini
+# If your migrations live in a root-level folder “alembic/”, copy it too
+COPY ./alembic           /app/alembic
+
+# entry-point
 RUN chmod +x /app/scripts/entrypoint.sh
 
-# ---------------------------------------------------------------------------
-# Network / runtime
-# ---------------------------------------------------------------------------
 EXPOSE 8000
-
-# Use the script that:
-#   1. Activates the venv
-#   2. Generates an Alembic revision (autogenerate) if needed
-#   3. Upgrades to head
-#   4. Launches Uvicorn
 ENTRYPOINT ["/app/scripts/entrypoint.sh"]

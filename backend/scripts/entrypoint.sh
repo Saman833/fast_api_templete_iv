@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 set -e
-
-# Activate the virtual-env so alembic/uvicorn use the right interpreter
 source /app/.venv/bin/activate
 
-echo "⏩ Generating new Alembic revision (autogenerate)..."
-alembic revision --autogenerate -m "auto migration from entrypoint" || true   # no-op if nothing changed
+# Point Alembic at the right ini file
+ALEMBIC_CFG="/app/alembic.ini"
 
-echo "⏫ Running Alembic migrations..."
-alembic upgrade head
+echo "⏩ Generating new Alembic revision (autogenerate)…"
+alembic -c "$ALEMBIC_CFG" revision --autogenerate -m "auto migration" || true
 
-echo "🚀 Starting Uvicorn ..."
+echo "⏫ Applying migrations…"
+alembic -c "$ALEMBIC_CFG" upgrade head
+
+echo "🚀 Launching Uvicorn…"
 exec uvicorn app.main:app --host 0.0.0.0 --port 8000
