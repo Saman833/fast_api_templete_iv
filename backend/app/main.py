@@ -5,7 +5,10 @@ from starlette.middleware.cors import CORSMiddleware
 
 from app.api.main import api_router
 from app.core.config import settings
-
+from app.competetive_programming.model.problem import Problem
+from app.competetive_programming.model.contest_problem import ContestProblem
+from app.competetive_programming.model.contest import Contest
+from app.competetive_programming.model.problem_creators import ProblemCreator
 
 def custom_generate_unique_id(route: APIRoute) -> str:
     return f"{route.tags[0]}-{route.name}"

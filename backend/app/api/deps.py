@@ -66,3 +66,27 @@ def get_group_service(
     return group_service
   
 GroupSer = Annotated[GroupService, Depends(get_group_service)]
+
+def get_problem_service(
+    session: SessionDep
+) :    
+    from app.competetive_programming.repo.problem_repo import ProblemRepo
+    from app.competetive_programming.service.problem_service import ProblemService
+    repo = ProblemRepo(session=session)
+    problem_service = ProblemService(repo=repo)
+    return problem_service
+from app.competetive_programming.service.problem_service import ProblemService
+
+ProblemServiceDep = Annotated[ProblemService, Depends(get_problem_service)]
+from app.competetive_programming.service.contest_service import ContestService
+
+def get_contest_service(
+    session: SessionDep
+) -> ContestService:
+    from app.competetive_programming.repo.contest_repo import ContestRepo
+    from app.competetive_programming.service.contest_service import ContestService
+    repo = ContestRepo(session=session)
+    contest_service = ContestService(repo=repo)
+    return contest_service
+
+ContestServiceDep = Annotated[ContestService, Depends(get_contest_service)]
