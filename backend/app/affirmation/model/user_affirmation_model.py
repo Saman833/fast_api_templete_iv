@@ -1,17 +1,15 @@
 import uuid
 from typing import Optional, List
 from sqlmodel import Field, SQLModel, Relationship
-
-
+from app.affirmation.enums import UserAffirmationStatus
+from datetime import datetime
 class UserAffirmation(SQLModel, table=True):
-    __table__="user_affiramtion"
-    affirmation_id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    user_id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    status: str = Field(min_length=1, max_length=10)
-# add a defult status , 
-class AffirmationStatus():
-    pass
+    __tablename__ = "user_affirmation"   
 
-
-# status in user_affirmation 
-# time in user 
+    user_id:uuid.UUID = Field(foreign_key="user.id", primary_key=True)
+    affirmation_id:uuid.UUID = Field(foreign_key="affirmation.id", primary_key=True)
+    status: str = Field(default=UserAffirmationStatus.PENDING.value)
+    updated_at: datetime = Field(
+        default_factory=datetime.utcnow,
+        sa_column_kwargs={"onupdate": datetime.utcnow}
+    )

@@ -1,0 +1,1 @@
+# I jusr decide not to add the create endpoint here becuase its literlly another domain :) 

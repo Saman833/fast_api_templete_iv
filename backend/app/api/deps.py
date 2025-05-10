@@ -12,6 +12,8 @@ from app.core import security
 from app.core.config import settings
 from app.core.db import engine
 from app.models import TokenPayload, User
+from app.affirmation.service.user_affirmation_service import UserAffirmationService
+from app.affirmation.service.affirmation_service import AffirmationService
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/login/access-token"
@@ -64,5 +66,25 @@ def get_group_service(
     repo= GroupRepository(session=session)
     group_service = GroupService(repo=repo)
     return group_service
-  
+
+def get_user_affirmation_service(session: SessionDep):
+    from app.affirmation.repository.affirmation_repo import AffirmationRepo
+    from app.affirmation.repository.user_affirmation_repo import UserAffirmationRepo
+    
+    user_affirmation_repo= UserAffirmationRepo(session=session)
+    affirmation_repo= AffirmationRepo(session=session)
+    user_affirmation_service = UserAffirmationService(user_affirmation_repo=user_affirmation_repo, affirmation_repo=affirmation_repo)
+    return  user_affirmation_service
+
+def get_affirmation_service(session: SessionDep):
+    from app.affirmation.repository.affirmation_repo import AffirmationRepo
+    from app.affirmation.repository.user_affirmation_repo import UserAffirmationRepo
+    
+    user_affirmation_repo= UserAffirmationRepo(session=session)
+    affirmation_repo= AffirmationRepo(session=session)
+    affirmation_service = AffirmationService(user_affirmation_repo=user_affirmation_repo, affirmation_repo=affirmation_repo)
+    return  affirmation_service
+UserAffirmationServiceDep=Annotated[UserAffirmationService,Depends(get_user_affirmation_service)]
+AffirmationServiceDep=Annotated[AffirmationService,Depends(get_affirmation_service)]
 GroupSer = Annotated[GroupService, Depends(get_group_service)]
+ 
